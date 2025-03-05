@@ -1,0 +1,190 @@
+---
+title: "Global Distribution of Ylang Ylang"
+author: "Naval Beekarun"
+date: "2025-03-04"
+output: html_document
+---
+## Introduction
+In this project, I will create an interactive GIS map using R. The goal is to visualize geographic data of and work with spatial layers. I will be representing the global distribution of Ylang Ylang, with use of iNaturalist data.
+
+## Setup
+First, I will load the necessary libraries.
+## Load necessary libraries
+```{r}
+library(tidyverse)  # Includes ggplot2, dplyr, tidyr, etc.
+library(tidyr)      # For tidying data
+library(sf)         # For spatial data handling
+library(ggplot2)    # For advanced plotting
+library(leaflet)    # For interactive maps
+library(dplyr)      # For data manipulation (if not included in tidyverse)
+
+```
+## Load the CSV file with coordinate data
+```{r}
+YlangFinalData <- read_csv("Ylang Final Coordinates.csv")
+
+```
+## Separate the Latitude and Longitude into separate columns
+```{r}
+# Separate the Latitude and Longitude into separate columns
+YlangFinalData <- YlangFinalData %>%
+  separate(`Latitude;Longitude`, into = c("Latitude", "Longitude"), sep = ";")
+```
+## Convert the data into an SF object
+```{r}
+YlangFinalData_sf <- YlangFinalData %>%
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326)
+```
+## Check the structure of the SF object
+```{r}
+print(YlangFinalData_sf)
+```
+# Display the first 6 rows of the data
+```{r}
+head(YlangFinalData)
+```
+## Plot the points on a map using ggplot2
+```{r}
+ggplot() +
+  geom_sf(data = YlangFinalData_sf, color = "blue", size = 1) +
+  theme_minimal() +
+  labs(title = "Global Distribution of Ylang Ylang")
+```
+## Convert Latitude and Longitude to numeric
+```{r}
+YlangFinalData$Longitude <- as.numeric(YlangFinalData$Longitude)
+YlangFinalData$Latitude <- as.numeric(YlangFinalData$Latitude)
+```
+## Create an interactive map using leaflet
+```{r}
+leaflet(data = YlangFinalData_sf) %>%
+  addTiles() %>%
+  addCircleMarkers(color = "blue", radius = 3, opacity = 0.6) %>%
+  setView(lng = mean(YlangFinalData$Longitude), lat = mean(YlangFinalData$Latitude), zoom = 2)
+```
+## Extract Latitude and Longitude from the geometry
+```{r}
+YlangFinalData_sf <- YlangFinalData_sf %>%
+  mutate(
+    Longitude = st_coordinates(YlangFinalData_sf)[, 1],  # Extract Longitude
+    Latitude = st_coordinates(YlangFinalData_sf)[, 2]    # Extract Latitude
+  )
+```
+## Create an interactive map using leaflet with popups displaying coordinates
+```{r}
+leaflet(data = YlangFinalData_sf) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    radius = 3,
+    opacity = 0.6,
+    popup = ~paste("Latitude: ", Latitude, "<br>Longitude: ", Longitude)  # Show coordinates in the popup
+  ) %>%
+  setView(lng = mean(YlangFinalData_sf$Longitude, na.rm = TRUE), 
+          lat = mean(YlangFinalData_sf$Latitude, na.rm = TRUE), zoom = 2)
+```
+## Create an interactive map with custom icon
+```{r}
+leaflet(data = YlangFinalData_sf) %>%
+  addTiles() %>%
+  addMarkers(
+    popup = ~paste("Latitude: ", Latitude, "<br>Longitude: ", Longitude),
+    icon = ~icons(
+      iconUrl = "YlangFinalIcon.png",  # Path to your image
+      iconWidth = 30,                  # Icon width
+      iconHeight = 30                  # Icon height
+    )
+  ) %>%
+  setView(lng = mean(YlangFinalData_sf$Longitude), lat = mean(YlangFinalData_sf$Latitude), zoom = 2)
+```
+
+## Create an interactive map with new custom icon
+```{r}
+leaflet(data = YlangFinalData_sf) %>%
+  addTiles() %>%
+  addMarkers(
+    popup = ~paste("Latitude: ", Latitude, "<br>Longitude: ", Longitude),
+    icon = ~icons(
+      iconUrl = "YlangIcon.png",  # Path to your image
+      iconWidth = 30,                  # Icon width
+      iconHeight = 30                  # Icon height
+    )
+  ) %>%
+  setView(lng = mean(YlangFinalData_sf$Longitude), lat = mean(YlangFinalData_sf$Latitude), zoom = 2)
+```
+## Define custom Ylang Icon
+```{r}
+YlangIcon <- icons(
+  iconUrl = "YlangIcon.png",  # Make sure the file name and path are correct
+  iconWidth = 30, 
+  iconHeight = 30
+)
+```
+## Change base map to a detailed topographic map with natural colors
+```{r}
+leaflet(data = YlangFinalData_sf) %>%
+  addProviderTiles(providers$Esri.WorldTopoMap) %>%  # Try this for a colorful, labeled map
+  addMarkers(
+    icon = YlangIcon,  # Keep the custom icon
+    popup = ~paste("Latitude: ", Latitude, "<br>Longitude: ", Longitude)
+  ) %>%
+  setView(lng = mean(YlangFinalData_sf$Longitude), lat = mean(YlangFinalData_sf$Latitude), zoom = 2)
+```
+
+## Change base map to National Geographic
+```{r}
+leaflet(data = YlangFinalData_sf) %>%
+  addProviderTiles(providers$Esri.NatGeoWorldMap) %>%  # National Geographic base map
+  addMarkers(
+    icon = YlangIcon,  # Keep the custom ylang ylang icon
+    popup = ~paste("Latitude: ", Latitude, "<br>Longitude: ", Longitude)
+  ) %>%
+  setView(lng = mean(YlangFinalData_sf$Longitude), lat = mean(YlangFinalData_sf$Latitude), zoom = 2)
+```
+
+
+```
+
+
+
+
+  
+```
+
+```
+
+
+
+```
+
+```
+
+
+
+
+
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

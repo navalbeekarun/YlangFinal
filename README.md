@@ -6,4 +6,4 @@ The plant is native to Southeast Asia, particularly Indonesia, Malaysia and the 
 # Data Sources
 The data was obtained from iNaturalist (https://www.inaturalist.org/). The species was searched and all observations worldwide were used. Of the 1026 total observations, the 1002 that had longitude and latitude coordinates were used to generate the map. 
 # How to view the project
-You can view the rendered HTML file using the following link: 
+You can view the rendered HTML document in your browser without downloading it by following this link: https://htmlview.glitch.me/?https://github.com/navalbeekarun/YlangFinal/blob/main/Ylang-Ylang-Final-Map.html
